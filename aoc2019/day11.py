@@ -4,7 +4,7 @@ test_inputs = [
     "inputs/day11"
 ]
 
-from aoc2019.intcode2 import IntCodeProcess
+from aoc2019.intcode import IntCodeProcess
 
 
 def paint(program, starting_color=None):

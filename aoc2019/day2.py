@@ -1,6 +1,6 @@
 import itertools
 
-from aoc2019 import intcode2
+from aoc2019 import intcode
 
 test_inputs = [
     "inputs/day2"
@@ -12,7 +12,7 @@ def process(path):
     with open(path) as f:
         for line in f:
             program = [int(x) for x in line.split(",")]
-            proc = intcode2.IntCodeProcess(program)
+            proc = intcode.IntCodeProcess(program)
             proc.memory[1] = 12
             proc.memory[2] = 2
             proc.run()
@@ -20,7 +20,7 @@ def process(path):
 
             target = 19690720
             for n, v in itertools.product(range(100), repeat=2):
-                proc = intcode2.IntCodeProcess(program)
+                proc = intcode.IntCodeProcess(program)
                 proc.memory[1] = n
                 proc.memory[2] = v
                 proc.run()

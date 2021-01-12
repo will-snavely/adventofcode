@@ -1,6 +1,6 @@
 import itertools
 
-from aoc2019.intcode2 import IntCodeProcess
+from aoc2019.intcode import IntCodeProcess
 
 test_inputs = [
     "inputs/day7"
