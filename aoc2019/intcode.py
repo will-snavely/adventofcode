@@ -11,8 +11,6 @@ def parse_instruction(instruction):
 class IntCodeProcess:
     def __init__(self, program, args=None):
         self.memory = collections.defaultdict(int)
-        for index, instruction in enumerate(program):
-            self.memory[index] = instruction
         self.input = collections.deque()
         if args:
             self.input.extend(args)
@@ -21,8 +19,30 @@ class IntCodeProcess:
         self.pc = 0
         self.rbo = 0
 
+        if program:
+            for index, instruction in enumerate(program):
+                self.memory[index] = instruction
+
+    @classmethod
+    def compile(cls, path):
+        code = []
+        with open(path) as f:
+            for line in f:
+                stripped = line.strip().strip(",")
+                code.extend([int(x) for x in stripped.split(",")])
+        return cls(code)
+
     def done(self):
         return self.state == "done"
+
+    def fork(self):
+        forked = IntCodeProcess(None)
+        forked.memory = self.memory.copy()
+        forked.input = self.input.copy()
+        forked.output = self.output.copy()
+        forked.pc = self.pc
+        forked.rbo = self.rbo
+        return forked
 
     def send(self, value):
         self.input.append(value)
