@@ -1,6 +1,6 @@
 test_inputs = [
     "inputs/day18_sample",
-    "inputs/day18",
+    "inputs/day18_part1",
 ]
 
 nums = set("0123456789")

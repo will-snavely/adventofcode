@@ -8,13 +8,68 @@ def parse_instruction(instruction):
     return opcode, flags
 
 
-class IntCodeProcess:
-    def __init__(self, program, args=None):
-        self.memory = collections.defaultdict(int)
+class IntCodeIO:
+    def __init__(self):
+        pass
+
+    def read(self):
+        raise NotImplemented
+
+    def send(self, value):
+        raise NotImplemented
+
+    def write(self, value):
+        raise NotImplemented
+
+    def flush(self):
+        raise NotImplemented
+
+    def fork(self):
+        raise NotImplemented
+
+
+class IntCodeQueueIO(IntCodeIO):
+    def __init__(self):
+        super().__init__()
         self.input = collections.deque()
-        if args:
-            self.input.extend(args)
         self.output = collections.deque()
+
+    def read(self):
+        if self.input:
+            return self.input.popleft()
+        return None
+
+    def send(self, value):
+        self.input.append(value)
+
+    def write(self, value):
+        self.output.append(value)
+
+    def flush(self):
+        result = []
+        while self.output:
+            result.append(self.output.popleft())
+        return result
+
+    def fork(self):
+        forked = IntCodeQueueIO()
+        forked.input = self.input.copy()
+        forked.output = self.output.copy()
+        return forked
+
+
+class IntCodeProcess:
+    def __init__(self, program, args=None, io=IntCodeQueueIO):
+        self.memory = collections.defaultdict(int)
+
+        self.io = None
+        if io is not None:
+            self.io = io()
+
+        if args:
+            for arg in args:
+                self.io.send(arg)
+
         self.state = "idle"
         self.pc = 0
         self.rbo = 0
@@ -24,34 +79,33 @@ class IntCodeProcess:
                 self.memory[index] = instruction
 
     @classmethod
-    def compile(cls, path):
+    def compile(cls, path, args=None, io=IntCodeQueueIO):
         code = []
         with open(path) as f:
             for line in f:
                 stripped = line.strip().strip(",")
                 code.extend([int(x) for x in stripped.split(",")])
-        return cls(code)
+        return cls(code, args=args, io=io)
 
     def done(self):
         return self.state == "done"
 
     def fork(self):
-        forked = IntCodeProcess(None)
+        forked = IntCodeProcess(None, io=None)
         forked.memory = self.memory.copy()
-        forked.input = self.input.copy()
-        forked.output = self.output.copy()
+        forked.io = self.io.fork()
         forked.pc = self.pc
         forked.rbo = self.rbo
+        forked.state = self.state
         return forked
 
-    def send(self, value):
-        self.input.append(value)
+    def send(self, *args):
+        for arg in args:
+            self.io.send(arg)
+            # self.input.append(arg)
 
     def flush(self):
-        result = []
-        while self.output:
-            result.append(self.output.popleft())
-        return result
+        return self.io.flush()
 
     def load(self, addr, flag=1):
         if flag == 0 or flag is None:
@@ -82,10 +136,13 @@ class IntCodeProcess:
                 result.append(self.load(value))
         return result
 
-    def run(self):
+    def run(self, budget=None):
         if self.state == "done":
             return
         self.state = "running"
+
+        if budget is not None and budget < 1:
+            return
 
         while True:
             opcode, flags = parse_instruction(self.load(self.pc))
@@ -107,8 +164,9 @@ class IntCodeProcess:
                 dest = self.load(self.pc + 1)
                 if len(flags) >= 1 and flags[0] == 2:
                     dest += self.rbo
-                if self.input:
-                    value = self.input.popleft()
+                value = self.io.read()
+                if value is not None:
+                    # value = self.input.popleft()
                     self.store(dest, value)
                     self.pc += 2
                 else:
@@ -118,7 +176,7 @@ class IntCodeProcess:
                 flag = 0
                 if flags:
                     flag = flags[0]
-                self.output.append(self.load(self.pc + 1, flag))
+                self.io.write(self.load(self.pc + 1, flag))
                 self.pc += 2
             elif opcode == 5:  # Jump If True
                 args = self.load_n(self.pc + 1, 2, flags)
@@ -162,3 +220,7 @@ class IntCodeProcess:
             elif opcode == 99:
                 self.state = "done"
                 return
+            if budget is not None:
+                budget = budget - 1
+                if budget <= 0:
+                    return
