@@ -41,13 +41,6 @@ def encode(command):
     return [ord(x) for x in command]
 
 
-deltas = {
-    "north": (0, 1),
-    "south": (0, -1),
-    "east": (1, 0),
-    "west": (-1, 0)
-}
-
 reverse = {
     "north": "south",
     "south": "north",
@@ -59,7 +52,7 @@ reverse = {
 def collect(seen, controller, entry_command, unsafe_items):
     if entry_command:
         controller.send(*encode(entry_command))
-    controller.run()
+    controller.simulate()
     output = "".join([chr(x) for x in controller.flush()])
     room, desc, exits, items = parse_output(output)
     if room not in seen:
@@ -69,7 +62,7 @@ def collect(seen, controller, entry_command, unsafe_items):
                 continue
             take_command = "take {}".format(item)
             controller.send(*encode(take_command))
-            controller.run()
+            controller.simulate()
             take_result = "".join([chr(x) for x in controller.flush()])
             if "Command?" not in take_result:
                 print("Unknown unsafe item?")
@@ -82,7 +75,7 @@ def collect(seen, controller, entry_command, unsafe_items):
                     collect(seen, controller, e, unsafe_items)
     if entry_command:
         controller.send(*encode(reverse[entry_command]))
-        controller.run()
+        controller.simulate()
         controller.flush()
 
 
@@ -94,11 +87,11 @@ def try_item_combos(controller, items):
             for item in drop:
                 command = "drop {}".format(item)
                 controller.send(*encode(command))
-                controller.run()
+                controller.simulate()
                 controller.flush()
             move = "south"
             controller.send(*encode(move))
-            controller.run()
+            controller.simulate()
             output = "".join([chr(x) for x in controller.flush()])
 
             if "You may proceed" in output:
@@ -108,7 +101,7 @@ def try_item_combos(controller, items):
             for item in drop:
                 command = "take {}".format(item)
                 controller.send(*encode(command))
-                controller.run()
+                controller.simulate()
                 controller.flush()
 
 
@@ -135,7 +128,7 @@ def part1(path):
     travel = ["west", "west", "north", "west", "south"]
     for cmd in travel:
         controller.send(*encode(cmd))
-        controller.run()
+        controller.simulate()
         controller.flush()
     try_item_combos(controller, safe_items)
 

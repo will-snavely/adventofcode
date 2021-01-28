@@ -1,7 +1,7 @@
 import collections
 
 test_inputs = [
-    "inputs/day15",
+    "inputs/day15_test1",
 ]
 
 

@@ -66,6 +66,9 @@ class SpaceCards2:
     # Assume n is prime, here. We multiply our increment by the
     # modular inverse of k
     def increment(self, k):
+        # Assumes n is prime; maybe it's enough for n and k to
+        # be coprime? I forget. Anyway, the problem guarantees
+        # that n and k are coprime.
         self.inc = (self.inc * pow(k, self.n - 2, self.n)) % self.n
 
     def materialize(self):
@@ -121,8 +124,7 @@ def process(path):
         offset = part2_cards.offset
         inc = part2_cards.inc
 
-        # We assume here that (1 - inc) % m is prime, which in this case
-        # it happens to be.
+        # This requires m to be prime, which it happens to b
         inv = pow(1 - inc, m - 2, m)
         offset_prime = (offset * (1 - pow(inc, rep, m)) * inv) % m
         inc_prime = pow(inc, rep, m)

@@ -1,6 +1,6 @@
 test_inputs = [
     "inputs/day17_sample",
-    "inputs/day17"
+    "inputs/day17_test1"
 ]
 
 

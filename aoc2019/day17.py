@@ -1,5 +1,5 @@
 test_inputs = [
-    "inputs/day17"
+    "inputs/day17_test1"
 ]
 
 from aoc2019.intcode import IntCodeProcess
@@ -87,7 +87,7 @@ def pathfind(img, pos):
 
 def part1(path):
     icp = IntCodeProcess.compile(path)
-    icp.run()
+    icp.simulate()
     output = icp.flush()
     image = parse_image(output)
     calibration = 0
@@ -138,7 +138,7 @@ def generate_encodings(
 def part2(path):
     icp = IntCodeProcess.compile(path)
     icp.memory[0] = 2
-    icp.run()
+    icp.simulate()
     output = icp.flush()
     image = parse_image(output)
 
@@ -190,11 +190,11 @@ def part2(path):
         for c in programs[prog]:
             icp.send(ord(c))
         icp.send(ord("\n"))
-        icp.run()
+        icp.simulate()
 
     icp.send(ord("n"))
     icp.send(ord("\n"))
-    icp.run()
+    icp.simulate()
     print(icp.flush()[-1])
 
 

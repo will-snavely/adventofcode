@@ -3,7 +3,7 @@ import collections
 from aoc2019.intcode import IntCodeProcess
 
 test_inputs = [
-    "inputs/day15"
+    "inputs/day15_test1"
 ]
 
 delta = {
@@ -52,7 +52,7 @@ def explore(
                 floor_map[adj_position] = "floor"
                 explore(adj_position, floor_map, controller, command)
             elif result == 2:
-                floor_map[adj_position] = "o2"
+                floor_map[adj_position] = "his"
                 explore(adj_position, floor_map, controller, command)
     if arrive_command:
         move(controller, inverse[arrive_command])
@@ -77,7 +77,7 @@ def draw_map(floor_map):
                     row += "."
                 elif type == "wall":
                     row += "#"
-                elif type == "o2":
+                elif type == "his":
                     row += "$"
             else:
                 row += "?"
@@ -106,7 +106,7 @@ def solve(controller: IntCodeProcess):
     }
     explore((0, 0), floor_map, controller, None)
     draw_map(floor_map)
-    o2_location = next(pos for pos in floor_map if floor_map[pos] == "o2")
+    o2_location = next(pos for pos in floor_map if floor_map[pos] == "his")
     distances_from_start = distances(floor_map, (0, 0))
     print(distances_from_start[o2_location])
     distances_from_o2 = distances(floor_map, o2_location)

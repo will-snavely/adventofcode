@@ -102,7 +102,6 @@ class IntCodeProcess:
     def send(self, *args):
         for arg in args:
             self.io.send(arg)
-            # self.input.append(arg)
 
     def flush(self):
         return self.io.flush()
@@ -166,7 +165,6 @@ class IntCodeProcess:
                     dest += self.rbo
                 value = self.io.read()
                 if value is not None:
-                    # value = self.input.popleft()
                     self.store(dest, value)
                     self.pc += 2
                 else:

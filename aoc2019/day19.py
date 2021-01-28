@@ -8,7 +8,7 @@ test_inputs = [
 def scan(icp, x, y):
     child = icp.fork()
     child.send(x, y)
-    child.run()
+    child.simulate()
     return child.flush()[0]
 
 

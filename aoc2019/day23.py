@@ -39,7 +39,7 @@ def part1(path):
 
     while True:
         for idx, node in enumerate(nodes):
-            node.run(budget=10)
+            node.simulate(budget=10)
             outputs[idx].extend(node.flush())
             while len(outputs[idx]) >= 3:
                 addr = outputs[idx].popleft()
@@ -66,7 +66,7 @@ def part2(path):
 
     while True:
         for idx, node in enumerate(nodes):
-            node.run(budget=10)
+            node.simulate(budget=10)
             outputs[idx].extend(node.flush())
             while len(outputs[idx]) >= 3:
                 addr = outputs[idx].popleft()

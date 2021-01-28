@@ -24,13 +24,13 @@ def run_script(intcode_path, script_path):
     with open(script_path) as f:
         script = f.readlines()
     controller = IntCodeProcess.compile(intcode_path)
-    controller.run()
+    controller.simulate()
     print(decode(controller.flush()))
     for line in script:
         line = line.strip()
         if line:
             controller.send(*encode(line + "\n"))
-    controller.run()
+    controller.simulate()
     print(decode(controller.flush()))
 
 
