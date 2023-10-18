@@ -25,7 +25,7 @@ class CRT:
 
 
 if __name__ == "__main__":
-    with open("inputs/day10") as f:
+    with open("aoc2022/inputs/day10") as f:
         lines = [line.strip() for line in f]
         cmds = []
         for line in lines:
